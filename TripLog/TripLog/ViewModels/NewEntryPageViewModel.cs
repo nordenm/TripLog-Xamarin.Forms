@@ -1,18 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using System.Windows.Input;
 using TripLog.Models;
+using TripLog.Services;
 using Xamarin.Forms;
 
 namespace TripLog.ViewModels
 {
     public class NewEntryPageViewModel : BaseValidationViewModel
     {
-        public NewEntryPageViewModel()
+        public NewEntryPageViewModel(INavService navService) : base(navService)
         {
             Date = DateTime.Today;
             Rating = 1;
+        }
+
+        public override void Init()
+        {
         }
 
         #region Attributes
@@ -99,7 +105,7 @@ namespace TripLog.ViewModels
         {
             get
             {
-                _saveCommand = _saveCommand ?? new Command(SaveCommandExecute);
+                _saveCommand = _saveCommand ?? new Command(async () => await SaveCommandExecute());
                 return _saveCommand;
             }
         }
@@ -108,7 +114,7 @@ namespace TripLog.ViewModels
 
         #region Methods
 
-        private void SaveCommandExecute()
+        private async Task SaveCommandExecute()
         {
             if (CanSave())
             {
@@ -123,6 +129,8 @@ namespace TripLog.ViewModels
                 };
 
                 // TODO: Persist entry in a later chapter
+
+                await NavService.GoBack();
             }
         }
 
