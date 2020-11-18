@@ -1,4 +1,7 @@
-﻿using System;
+﻿using Ninject;
+using Ninject.Modules;
+using System;
+using TripLog.Modules;
 using TripLog.Services;
 using TripLog.ViewModels;
 using TripLog.Views;
@@ -9,17 +12,30 @@ namespace TripLog
 {
     public partial class App : Application
     {
-        public App()
+        public IKernel Kernel { get; set; }
+
+        public App(params INinjectModule[] platformModules)
         {
             InitializeComponent();
 
-            var mainPage = new NavigationPage(new MainPage());
-            var navService = DependencyService.Get<INavService>() as XamarinFormsNavService;
+            // Register core services
+            Kernel = new StandardKernel(new TripLogCoreModule(), new TripLogNavModule());
 
+            // Register platform specific services
+            Kernel.Load(platformModules);
+
+            SetMainPage();
+        }
+
+        void SetMainPage()
+        {
+            var mainPage = new NavigationPage(new MainPage())
+            {
+                BindingContext = Kernel.Get<MainPageViewModel>()
+            };
+
+            var navService = Kernel.Get<INavService>() as XamarinFormsNavService;
             navService.XamarinFormsNav = mainPage.Navigation;
-            navService.RegisterViewMapping(typeof(MainPageViewModel), typeof(MainPage));
-            navService.RegisterViewMapping(typeof(DetailPageViewModel), typeof(DetailPage));
-            navService.RegisterViewMapping(typeof(NewEntryPageViewModel), typeof(NewEntryPage));
 
             MainPage = mainPage;
         }

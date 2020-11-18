@@ -9,7 +9,6 @@ using TripLog.Services;
 using TripLog.ViewModels;
 using Xamarin.Forms;
 
-[assembly: Dependency(typeof(XamarinFormsNavService))]
 namespace TripLog.Services
 {
     public class XamarinFormsNavService : INavService
@@ -106,6 +105,9 @@ namespace TripLog.Services
                                       .FirstOrDefault(dc => !dc.GetParameters().Any());
             var view = constructor.Invoke(null) as Page;
 
+            var vm = ((App)Application.Current).Kernel.GetService(viewModelType);
+
+            view.BindingContext = vm;
             await XamarinFormsNav.PushAsync(view, true);
         }
 

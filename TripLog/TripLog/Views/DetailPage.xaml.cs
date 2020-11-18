@@ -14,8 +14,6 @@ namespace TripLog.Views
         public DetailPage()
         {
             InitializeComponent();
-
-            BindingContext = new DetailPageViewModel(DependencyService.Get<INavService>());
         }
 
         protected override void OnAppearing()
